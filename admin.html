@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head><title>Admin - SquadClutchX</title></head>
+<body>
+  <h2>Admin Dashboard</h2>
+  <input id="tournament" placeholder="Tournament Name">
+  <button onclick="addTournament()">Add</button>
+  <div id="list"></div>
+  <script type="module">
+    import {
+      auth, db, doc, setDoc, getDocs, collection, onAuthStateChanged
+    } from './firebase-config.js';
+
+    const adminEmail = "tarunkashyap3842@gmail.com";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user || user.email !== adminEmail) {
+        alert("Access Denied");
+        location.href = "login.html";
+      } else {
+        const snapshot = await getDocs(collection(db, "tournaments"));
+        const list = document.getElementById("list");
+        snapshot.forEach(doc => {
+          const div = document.createElement("div");
+          div.innerText = doc.data().name;
+          list.appendChild(div);
+        });
+      }
+    });
+
+    window.addTournament = async () => {
+      const name = document.getElementById("tournament").value;
+      const id = Date.now().toString(); // Unique ID
+      await setDoc(doc(db, "tournaments", id), { name });
+      alert("Tournament added!");
+      location.reload();
+    }
+  </script>
+</body>
+</html>
